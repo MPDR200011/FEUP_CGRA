@@ -1,7 +1,7 @@
 /**
- * MyScene
- * @constructor
- */
+* MyScene
+* @constructor
+*/
 class MyScene extends CGFscene {
     constructor() {
         super();
@@ -12,22 +12,44 @@ class MyScene extends CGFscene {
         this.initLights();
 
         //Background color
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
         this.gl.clearDepth(100.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.CULL_FACE);
         this.gl.depthFunc(this.gl.LEQUAL);
+        this.enableTextures(true);
+
+        //Objects connected to MyInterface
+        this.axiom = "F--F--F"; // "X"; //
+        this.ruleF = "F+F--F+F"; // "FF"; //
+        //this.ruleX = "F[-X][X]F[-X]+FX";
+        this.angle = 60.0;
+        this.iterations = 2;
+        this.scaleFactor = 1;
+        this.lSystem = new MyLSystem(this);
+
+        this.doGenerate = function () {
+            this.lSystem.generate(
+                this.axiom,
+                {
+                    "F": [ this.ruleF ],
+                    "X": [ this.ruleX ]
+                },
+                this.angle,
+                this.iterations,
+                this.scaleFactor
+            );
+        }
+
+        // do initial generation
+        this.doGenerate();
 
         //Initialize scene objects
         this.axis = new CGFaxis(this);
-        this.tangram = new MyTangram(this);
-	this.cube = new MyUnitCube(this);
-
-        //Objects connected to MyInterface
-        this.displayAxis = true;
-        this.scaleFactor = 1;
+        
     }
+
     initLights() {
         this.lights[0].setPosition(15, 2, 5, 1);
         this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
@@ -55,35 +77,13 @@ class MyScene extends CGFscene {
         this.applyViewMatrix();
 
         // Draw axis
-        if (this.displayAxis)
-            this.axis.display();
+        this.axis.display();
 
         this.setDefaultAppearance();
 
-        var sca = [
-            this.scaleFactor, 0.0, 0.0, 0.0,
-            0.0, this.scaleFactor, 0.0, 0.0,
-            0.0, 0.0, this.scaleFactor, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        ];
-        this.multMatrix(sca);
-
-
         // ---- BEGIN Primitive drawing section
 
-        this.pushMatrix();
-        
-        this.translate(2.5,0,5.2);
-        this.rotate(-Math.PI / 2, 1,0,0);
-        
-        this.pushMatrix();
-        this.translate(0.5,-0.3,-0.5);
-        this.scale(6,11,1);
-        this.cube.display();
-        this.popMatrix();
-
-        this.tangram.display();
-        this.popMatrix();
+        this.lSystem.display();
 
         // ---- END Primitive drawing section
     }
