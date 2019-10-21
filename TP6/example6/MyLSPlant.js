@@ -8,7 +8,5 @@ class MyLSPlant extends MyLSystem {
             "F": new MyBranch(this.scene),
             "X": new MyLeaf(this.scene)
         };
-    };
-
-    
+    }
 }
